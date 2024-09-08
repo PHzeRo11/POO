@@ -1,0 +1,83 @@
+import ipywidgets as widgets
+from IPython.display import display
+
+class Menu:
+    def __init__(self):
+        self.itens = []
+        self.output = widgets.Output()
+
+        self.botao_adicionar = widgets.Button(description="Adicionar Item")
+        self.botao_adicionar.on_click(self.adicionar_item)
+
+        self.botao_visualizar = widgets.Button(description="Visualizar Itens")
+        self.botao_visualizar.on_click(self.visualizar_itens)
+
+        self.botao_remover = widgets.Button(description="Remover Item")
+        self.botao_remover.on_click(self.remover_item)
+
+        self.botao_contar = widgets.Button(description="Contar Itens")
+        self.botao_contar.on_click(self.contar_itens)
+
+        self.caixa_texto = widgets.Text(placeholder='Digite o nome do item')
+
+        self.caixa_selecao = widgets.Select(options=[str(i) for i in range(1, len(self.itens) + 1)], description='Número do item:')
+
+    def adicionar_item(self, b):
+        item = self.caixa_texto.value
+        self.itens.append(item)
+        self.caixa_texto.value = ''
+        with self.output:
+            print(f"Item '{item}' adicionado com sucesso!")
+        self.atualizar_caixa_selecao()
+
+    def visualizar_itens(self, b):
+        with self.output:
+            if self.itens:
+                for idx, item in enumerate(self.itens, start=1):
+                    print(f"{idx}. {item}")
+            else:
+                print("A lista está vazia.")
+
+    def remover_item(self, b):
+        if self.itens:
+            try:
+                idx = int(self.caixa_selecao.value)
+                item = self.itens.pop(idx - 1)
+                with self.output:
+                    print(f"Item '{item}' removido com sucesso!")
+            except:
+                with self.output:
+                    print("Número inválido.")
+            self.atualizar_caixa_selecao()
+
+    def contar_itens(self, b):
+        with self.output:
+            print(f"Total de itens: {len(self.itens)}")
+
+    def atualizar_caixa_selecao(self):
+        self.caixa_selecao.options = [str(i) for i in range(1, len(self.itens) + 1)]
+
+    def mostrar_menu(self):
+      # Estilo dos botões
+      estilo_botao = {'button_color': 'green', 'font_arial': 'bold'}
+      self.botao_adicionar.style.button_color = estilo_botao['button_color']
+      self.botao_visualizar.style.button_color = estilo_botao['button_color']
+      self.botao_remover.style.button_color = estilo_botao['button_color']
+      self.botao_contar.style.button_color = estilo_botao['button_color']
+
+      # Layout em abas
+      abas = widgets.Tab(children=[
+          widgets.VBox([self.caixa_texto, self.botao_adicionar]),
+          widgets.VBox([self.botao_visualizar, self.output]),
+          widgets.VBox([self.caixa_selecao, self.botao_remover]),
+          widgets.VBox([self.botao_contar, self.output])
+      ])
+      abas.set_title(0, 'Adicionar Item')
+      abas.set_title(1, 'Visualizar Itens')
+      abas.set_title(2, 'Remover Item')
+      abas.set_title(3, 'Contar Itens')
+
+      display(abas)
+
+menu = Menu()
+menu.mostrar_menu()
